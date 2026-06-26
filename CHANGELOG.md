@@ -5,6 +5,14 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-06-26
+
+### Añadido
+- Archivo `src/services/firebase.ts` para centralizar la conexión con el backend as a service (BaaS).
+- Instancia nombrada `auth` (Firebase Authentication) para la gestión del estado de sesión de los usuarios.
+- Instancia nombrada `db` (Cloud Firestore) para dar soporte a la futura persistencia de datos.
+- Archivo `src/vite-env.d.ts` que extiende la interfaz de entorno de Vite para forzar el tipado estricto en TypeScript de las credenciales, previniendo fallos en tiempo de compilación.
+
 ## [0.1.0] - 2026-06-22
 
 ### Añadido

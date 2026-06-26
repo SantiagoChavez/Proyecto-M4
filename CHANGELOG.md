@@ -5,6 +5,12 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-06-26
+
+### Añadido
+- Archivo `src/types/task.types.ts` con la definición e interfaz estricta de `Task` para el modelo de datos de las tareas.
+- Archivo `firestore.rules` en la raíz del proyecto para definir reglas de seguridad en Cloud Firestore que restringen el acceso a las tareas únicamente a sus creadores/propietarios autenticados.
+
 ## [0.4.0] - 2026-06-26
 
 ### Añadido

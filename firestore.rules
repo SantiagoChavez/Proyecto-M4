@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas para la colección 'tasks'
+    match /tasks/{taskId} {
+      // Permite la creación si el usuario está autenticado y se asigna como dueño de la tarea
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      
+      // Permite lectura, actualización y eliminación si el usuario autenticado es el dueño de la tarea
+      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}

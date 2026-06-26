@@ -5,6 +5,14 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-06-26
+
+### Añadido
+- Archivo `src/routes/ProtectedRoute.tsx` que actúa como guardián de rutas privadas.
+- Propiedades tipadas (`ProtectedRouteProps`) para envolver componentes hijos (`children`).
+- Manejo del estado `loading` para prevenir parpadeos y desajustes visuales mientras se comprueba la sesión con Firebase.
+- Redirección automática segura mediante `<Navigate to="/login" replace />` de `react-router-dom` para usuarios no autenticados.
+
 ## [0.3.0] - 2026-06-26
 
 ### Añadido

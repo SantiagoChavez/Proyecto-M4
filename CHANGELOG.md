@@ -5,6 +5,15 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-06-26
+
+### Añadido
+- Archivo `src/features/auth/AuthContext.tsx` que provee el contexto global de autenticación (`AuthContext`) e inicializa el proveedor `AuthProvider`.
+- Métodos integrados en el contexto de autenticación: `loginWithEmail`, `registerWithEmail`, `loginWithGoogle` (utilizando popups) y `logout`.
+- Suscripción al estado de la sesión mediante `onAuthStateChanged` con desuscripción automática al desmontar para evitar fugas de memoria.
+- Custom hook `src/hooks/useAuth.ts` que permite un consumo tipado y seguro del contexto de autenticación global.
+- Utilidad `src/utils/authErrors.ts` para la traducción estricta de códigos de error de Firebase Auth a mensajes amigables para el usuario final en español.
+
 ## [0.2.0] - 2026-06-26
 
 ### Añadido

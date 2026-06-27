@@ -5,6 +5,13 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-06-26
+
+### Añadido
+- Vistas base en `src/pages/`: `Login.tsx` (formulario de inicio de sesión con email/password y soporte para Google), `Register.tsx` (formulario de registro) y `Dashboard.tsx` (estructura principal y encabezado del gestor de tareas).
+- Rutas públicas y privadas integradas en `src/App.tsx` usando `react-router-dom`, envolviendo las rutas con `AuthProvider` y protegiendo el panel del Dashboard con `ProtectedRoute`.
+- Estilos visuales adaptados y organizados en `src/App.css` con clases CSS Vanilla para maquetar tarjetas, inputs, botones de acción y layouts.
+
 ## [0.5.0] - 2026-06-26
 
 ### Añadido

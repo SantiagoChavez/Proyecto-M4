@@ -5,6 +5,21 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-06-27
+
+### Añadido
+- Servicio `src/services/taskService.ts` para gestionar las operaciones CRUD de tareas con Firestore usando APIs modulares de v9+: `getTasksByUser` (escucha en tiempo real), `createTask`, `toggleTaskStatus` y `deleteTask`.
+- Integración completa del CRUD de tareas en la interfaz del `Dashboard` (`src/pages/Dashboard.tsx`) conectando el formulario de creación, el cambio de estado mediante checkbox y la eliminación de ítems con persistencia remota.
+- Manejo reactivo de la carga y el desmontaje de la suscripción de `onSnapshot` para prevenir fugas de memoria.
+- Clases de estilo CSS añadidas a `src/App.css` para el formulario y tarjetas de tareas con diseño responsivo integrado.
+- Función Serverless en `functions/send-email.js` que utiliza el cliente AWS SES SDK v3 (`@aws-sdk/client-ses`) para procesar solicitudes POST y enviar correos de reporte de tareas de forma segura desde el backend.
+- Archivo proxy `api/send-email.js` para exponer el endpoint del reporte en `/api/send-email` manteniendo la compatibilidad zero-config en Vercel.
+- Integración en la interfaz de usuario `src/pages/Dashboard.tsx` con el botón "Enviar reporte de tareas por correo" para recopilar, dar formato en español y despachar el resumen de tareas en tiempo real.
+- Estados en React (`emailLoading`, `emailSuccess`, `emailError`) y clases CSS en `src/App.css` para proveer retroalimentación visual clara durante el proceso de envío.
+
+### Modificado
+- Robustecido el manejo de respuestas en `handleSendEmailReport` dentro de `src/pages/Dashboard.tsx` agregando validaciones del código de estado HTTP y del Content-Type de las cabeceras para prevenir fallos al parsear JSON vacío en el entorno de desarrollo local de Vite.
+
 ## [0.6.0] - 2026-06-26
 
 ### Añadido

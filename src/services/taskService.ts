@@ -22,7 +22,8 @@ import type { Task } from '../types/task.types';
  */
 export const getTasksByUser = (
   userId: string, 
-  callback: (tasks: Task[]) => void
+  callback: (tasks: Task[]) => void,
+  errorCallback?: (error: Error) => void
 ): Unsubscribe => {
   const q = query(
     collection(db, 'tasks'),
@@ -30,16 +31,26 @@ export const getTasksByUser = (
     orderBy('createdAt', 'desc')
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const tasks: Task[] = [];
-    snapshot.forEach((documento) => {
-      tasks.push({
-        id: documento.id,
-        ...documento.data()
-      } as Task);
-    });
-    callback(tasks);
-  });
+  return onSnapshot(
+    q, 
+    (snapshot) => {
+      const tasks: Task[] = [];
+      snapshot.forEach((documento) => {
+        tasks.push({
+          id: documento.id,
+          ...documento.data()
+        } as Task);
+      });
+      callback(tasks);
+    },
+    (error) => {
+      if (errorCallback) {
+        errorCallback(error);
+      } else {
+        console.error('Error en tiempo real de Firestore:', error);
+      }
+    }
+  );
 };
 
 /**
@@ -75,4 +86,18 @@ export const toggleTaskStatus = async (
 export const deleteTask = async (taskId: string): Promise<void> => {
   const taskRef = doc(db, 'tasks', taskId);
   await deleteDoc(taskRef);
+};
+
+/**
+ * Actualiza los campos específicos de una tarea en Firestore.
+ * 
+ * @param taskId - ID de la tarea a actualizar.
+ * @param fieldsToUpdate - Objeto parcial con los campos a modificar.
+ */
+export const updateTask = async (
+  taskId: string,
+  fieldsToUpdate: Partial<Omit<Task, 'id'>>
+): Promise<void> => {
+  const taskRef = doc(db, 'tasks', taskId);
+  await updateDoc(taskRef, fieldsToUpdate);
 };

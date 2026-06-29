@@ -397,4 +397,69 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+/* Password Toggle Eye Styling */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-field {
+  padding-right: 48px !important;
+}
+
+.password-toggle-button {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  transition: opacity 0.2s;
+}
+
+.password-toggle-button:hover {
+  opacity: 0.8;
+}
+
+.auth-separator {
+  text-align: center;
+  color: var(--text);
+  font-size: 14px;
+  margin: 20px 0 16px 0;
+  opacity: 0.6;
+}
+
+/* Edit Task UI Classes */
+.edit-task-button {
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.edit-task-button:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.task-card-edit-mode {
+  border: 1px solid var(--primary) !important;
+  background: rgba(99, 102, 241, 0.03) !important;
+}
+
+
+
+
 

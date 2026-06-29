@@ -5,6 +5,16 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-06-28
+
+### Añadido
+- Suite de pruebas de componentes y comportamiento en `tests/Dashboard.test.tsx` cubriendo el corte de conexión en Firestore, prevención de XSS, fallas en la API serverless (400 Bad Request), límites visuales de texto y el flujo CRUD de edición inline.
+- Configuración de pruebas globales en `tests/setup.ts` con mocks globales estables de la suite de SDKs de Firebase (`firebase/app`, `firebase/auth`, `firebase/firestore`) para evitar fugas de memoria y bloqueos de red (OOM).
+- Configuración de Vitest integrada en `vite.config.ts` operando con el entorno virtual `jsdom`.
+
+### Modificado
+- Ampliada la firma del servicio `getTasksByUser` en `src/services/taskService.ts` y su suscripción reactiva en `src/pages/Dashboard.tsx` para incorporar el soporte y manejo adaptado de callbacks de errores en tiempo de ejecución.
+
 ## [0.7.0] - 2026-06-27
 
 ### Añadido
@@ -16,6 +26,11 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - Archivo proxy `api/send-email.js` para exponer el endpoint del reporte en `/api/send-email` manteniendo la compatibilidad zero-config en Vercel.
 - Integración en la interfaz de usuario `src/pages/Dashboard.tsx` con el botón "Enviar reporte de tareas por correo" para recopilar, dar formato en español y despachar el resumen de tareas en tiempo real.
 - Estados en React (`emailLoading`, `emailSuccess`, `emailError`) y clases CSS en `src/App.css` para proveer retroalimentación visual clara durante el proceso de envío.
+- Botón con selector de visibilidad utilizando emojis interactivos de monito (`🙈` para cuando está oculta la contraseña y la cara de monito destapado `🐵` para cuando está visible) para alternar el estado de la contraseña en `Login` y `Register` de manera intuitiva y amigable.
+- Separador textual ("o también puedes") y logotipo vectorial oficial de Google (SVG multicolor) integrados en el botón de inicio de sesión de la vista `Login`.
+- Función `updateTask` en `src/services/taskService.ts` para posibilitar la actualización parcial de tareas en Firestore.
+- Interfaz de edición inline para tareas en `src/pages/Dashboard.tsx`, permitiendo modificar el título y descripción de tareas existentes con control de estados.
+- Clases de estilo CSS para el botón de edición y contenedor en modo de edición inline de las tarjetas de tareas en `src/App.css`.
 
 ### Modificado
 - Robustecido el manejo de respuestas en `handleSendEmailReport` dentro de `src/pages/Dashboard.tsx` agregando validaciones del código de estado HTTP y del Content-Type de las cabeceras para prevenir fallos al parsear JSON vacío en el entorno de desarrollo local de Vite.

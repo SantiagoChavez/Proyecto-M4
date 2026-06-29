@@ -5,7 +5,8 @@ import {
   getTasksByUser, 
   createTask, 
   toggleTaskStatus, 
-  deleteTask 
+  deleteTask,
+  updateTask
 } from '../services/taskService';
 import type { Task } from '../types/task.types';
 
@@ -27,14 +28,27 @@ export const Dashboard = () => {
   const [emailSuccess, setEmailSuccess] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
+  // Estados para la edición de tareas
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState<string>('');
+  const [editDescription, setEditDescription] = useState<string>('');
+
   // Escuchar tareas en tiempo real asociadas al usuario autenticado
   useEffect(() => {
     if (!user) return;
 
-    const unsubscribe = getTasksByUser(user.uid, (loadedTasks) => {
-      setTasks(loadedTasks);
-      setLoadingTasks(false);
-    });
+    const unsubscribe = getTasksByUser(
+      user.uid, 
+      (loadedTasks) => {
+        setTasks(loadedTasks);
+        setLoadingTasks(false);
+      },
+      (err) => {
+        console.error('Error al suscribir tareas:', err);
+        setError('Error al sincronizar las tareas desde el servidor.');
+        setLoadingTasks(false);
+      }
+    );
 
     // Limpieza al desmontar
     return () => unsubscribe();
@@ -92,6 +106,37 @@ export const Dashboard = () => {
       await deleteTask(taskId);
     } catch (err: unknown) {
       console.error('Error al eliminar tarea:', err);
+    }
+  };
+
+  // Activar el modo de edición de una tarea
+  const handleEditClick = (task: Task) => {
+    setError(null);
+    setEditingTaskId(task.id);
+    setEditTitle(task.title);
+    setEditDescription(task.description || '');
+  };
+
+  // Guardar cambios de una tarea editada
+  const handleUpdateTask = async (taskId: string) => {
+    setError(null);
+
+    if (!editTitle.trim()) {
+      setError('El título de la tarea es requerido.');
+      return;
+    }
+
+    try {
+      await updateTask(taskId, {
+        title: editTitle.trim(),
+        description: editDescription.trim(),
+      });
+      setEditingTaskId(null);
+      setEditTitle('');
+      setEditDescription('');
+    } catch (err: unknown) {
+      console.error('Error al actualizar la tarea:', err);
+      setError('No se pudo actualizar la tarea. Intente de nuevo.');
     }
   };
 
@@ -228,35 +273,90 @@ export const Dashboard = () => {
           </div>
         ) : (
           <div className="task-list">
-            {tasks.map((task) => (
-              <div key={task.id} className="task-card">
-                <div className="task-details">
-                  <div className="task-checkbox-container">
-                    <input
-                      type="checkbox"
-                      className="task-checkbox"
-                      checked={task.completed}
-                      onChange={() => handleToggleStatus(task.id, task.completed)}
-                    />
-                  </div>
-                  <div className="task-text">
-                    <h3 className={`task-title ${task.completed ? 'completed' : ''}`}>
-                      {task.title}
-                    </h3>
-                    {task.description && (
-                      <p className={`task-desc ${task.completed ? 'completed' : ''}`}>
-                        {task.description}
-                      </p>
-                    )}
-                  </div>
+            {tasks.map((task) => {
+              const isEditing = task.id === editingTaskId;
+
+              return (
+                <div key={task.id} className={`task-card ${isEditing ? 'task-card-edit-mode' : ''}`}>
+                  {isEditing ? (
+                    <div className="task-edit-container" style={{ width: '100%' }}>
+                      <div className="task-edit-inputs" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <input
+                            type="text"
+                            className="form-input"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            placeholder="Título de la tarea"
+                            required
+                          />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <input
+                            type="text"
+                            className="form-input"
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            placeholder="Descripción (opcional)"
+                          />
+                        </div>
+                      </div>
+                      <div className="task-actions edit-mode-actions" style={{ display: 'flex', gap: '8px' }}>
+                        <button 
+                          onClick={() => handleUpdateTask(task.id)} 
+                          className="auth-button" 
+                          style={{ marginTop: 0, width: 'auto', paddingInline: '16px', fontSize: '13px' }}
+                        >
+                          Guardar
+                        </button>
+                        <button 
+                          onClick={() => setEditingTaskId(null)} 
+                          className="auth-button-secondary" 
+                          style={{ marginTop: 0, width: 'auto', paddingInline: '16px', fontSize: '13px' }}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="task-details">
+                        <div className="task-checkbox-container">
+                          <input
+                            type="checkbox"
+                            className="task-checkbox"
+                            checked={task.completed}
+                            onChange={() => handleToggleStatus(task.id, task.completed)}
+                          />
+                        </div>
+                        <div className="task-text">
+                          <h3 className={`task-title ${task.completed ? 'completed' : ''}`}>
+                            {task.title}
+                          </h3>
+                          {task.description && (
+                            <p className={`task-desc ${task.completed ? 'completed' : ''}`}>
+                              {task.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="task-actions">
+                        <button 
+                          onClick={() => handleEditClick(task)} 
+                          className="edit-task-button"
+                          style={{ marginRight: '8px' }}
+                        >
+                          Editar
+                        </button>
+                        <button onClick={() => handleDeleteTask(task.id)} className="delete-task-button">
+                          Eliminar
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <div className="task-actions">
-                  <button onClick={() => handleDeleteTask(task.id)} className="delete-task-button">
-                    Eliminar
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>

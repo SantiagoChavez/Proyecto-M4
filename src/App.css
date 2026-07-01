@@ -358,17 +358,29 @@
   padding: 8px 12px;
   font-size: 13px;
   font-weight: 600;
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #a78278;
+  background: transparent;
+  border: 1px solid var(--border);
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .delete-task-button:hover {
-  background: #ef4444;
-  color: #fff;
+  background: rgba(239, 68, 68, 0.05);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.dark-theme .delete-task-button {
+  color: #c5a095;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-theme .delete-task-button:hover {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
 }
 
 /* Email Report Status Feedbacks */
@@ -445,22 +457,22 @@
   padding: 8px 12px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
 
 .edit-task-button:hover {
-  background: var(--primary);
+  background: var(--accent);
   color: #fff;
 }
 
 .task-card-edit-mode {
-  border: 1px solid var(--primary) !important;
-  background: rgba(99, 102, 241, 0.03) !important;
+  border: 1px solid var(--accent) !important;
+  background: var(--accent-bg) !important;
 }
 
 /* Layout Split Screen for Auth Pages */
@@ -1002,14 +1014,14 @@
 
 /* Priority Badges */
 .badge-priority-alta {
-  background: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.15);
+  background: rgba(239, 68, 68, 0.05);
+  color: #da3737;
+  border: 1px solid rgba(239, 68, 68, 0.1);
 }
 .dark-theme .badge-priority-alta {
-  background: rgba(248, 113, 113, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(248, 113, 113, 0.25);
+  background: rgba(248, 113, 113, 0.08);
+  color: #fca5a5;
+  border: 1px solid rgba(248, 113, 113, 0.15);
 }
 
 .badge-priority-media {
@@ -1118,6 +1130,60 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: transparent;
   background: transparent;
   cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    gap: 12px;
+  }
+
+  .dashboard-user-info {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .user-email {
+    margin-bottom: 2px;
+  }
+
+  .logout-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .dashboard-content {
+    padding: 24px 16px;
+  }
+
+  .task-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .task-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .edit-task-button,
+  .delete-task-button {
+    flex: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 38px;
+    margin-right: 0 !important; /* Overwrite inline margins */
+  }
 }
 
 

@@ -1199,6 +1199,88 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 }
 
+/* NotFound Page Styles */
+.notfound-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background: #0c0e14;
+  box-sizing: border-box;
+  padding: 40px 24px;
+}
+
+.notfound-card {
+  width: 100%;
+  max-width: 480px;
+  background: #161822;
+  border: 1px solid #252833;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.notfound-img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.notfound-title {
+  font-size: 64px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  color: #fbbf24;
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+.notfound-text {
+  font-size: 15px;
+  color: #a7a9be;
+  margin: 0 0 28px 0;
+  line-height: 1.6;
+}
+
+.notfound-btn {
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: #c59b6d;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.notfound-btn:hover {
+  opacity: 0.95;
+}
+
+.notfound-btn:active {
+  transform: scale(0.98);
+}
+
+.notfound-timer {
+  font-size: 13px;
+  color: #7f8197;
+  margin: 0;
+}
+
 
 
 

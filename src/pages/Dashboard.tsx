@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import type { SubmitEvent } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { 
   getTasksByUser, 
@@ -9,23 +8,19 @@ import {
   updateTask
 } from '../services/taskService';
 import type { Task } from '../types/task.types';
+import { TaskForm } from '../components/TaskForm';
+import { TaskCard } from '../components/TaskCard';
+import { Toast } from '../components/Toast';
 
 /**
  * Panel de control principal (Dashboard) para gestionar tareas en tiempo real.
+ * Componente contenedor inteligente que distribuye y sincroniza el estado.
  */
 export const Dashboard = () => {
   const { user, logout } = useAuth();
   
-  // Estados para las tareas y el formulario
+  // Estados para las tareas
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [priority, setPriority] = useState<'alta' | 'media' | 'baja'>('media');
-  const [dueDate, setDueDate] = useState<string>(() => {
-    return new Date().toISOString().split('T')[0];
-  });
-  const [assignedArea, setAssignedArea] = useState<'desarrollo' | 'diseño' | 'marketing' | 'soporte'>('desarrollo');
-
   const [loadingTasks, setLoadingTasks] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,13 +29,8 @@ export const Dashboard = () => {
   const [emailSuccess, setEmailSuccess] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
-  // Estados para la edición de tareas
+  // ID de la tarea actualmente en modo edición
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState<string>('');
-  const [editDescription, setEditDescription] = useState<string>('');
-  const [editPriority, setEditPriority] = useState<'alta' | 'media' | 'baja'>('media');
-  const [editDueDate, setEditDueDate] = useState<string>('');
-  const [editAssignedArea, setEditAssignedArea] = useState<'desarrollo' | 'diseño' | 'marketing' | 'soporte'>('desarrollo');
 
   // Filtros dinámicos
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all');
@@ -96,33 +86,24 @@ export const Dashboard = () => {
   };
 
   // Crear una nueva tarea
-  const handleCreateTask = async (e: SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleCreateTask = async (taskData: {
+    title: string;
+    description: string;
+    priority: 'alta' | 'media' | 'baja';
+    dueDate: string;
+    assignedArea: 'desarrollo' | 'diseño' | 'marketing' | 'soporte';
+  }) => {
     setError(null);
-
-    if (!title.trim()) {
-      setError('El título de la tarea es requerido.');
-      return;
-    }
 
     if (!user) return;
 
     try {
       await createTask({
-        title: title.trim(),
-        description: description.trim(),
+        ...taskData,
         completed: false,
         userId: user.uid,
-        createdAt: new Date().toISOString(),
-        priority,
-        dueDate,
-        assignedArea
+        createdAt: new Date().toISOString()
       });
-      setTitle('');
-      setDescription('');
-      setPriority('media');
-      setDueDate(new Date().toISOString().split('T')[0]);
-      setAssignedArea('desarrollo');
       setToast({ message: '¡Tarea creada con éxito!', type: 'success' });
     } catch (err: unknown) {
       console.error('Error al crear tarea:', err);
@@ -156,42 +137,15 @@ export const Dashboard = () => {
     }
   };
 
-  // Activar el modo de edición de una tarea
-  const handleEditClick = (task: Task) => {
-    setError(null);
-    setEditingTaskId(task.id);
-    setEditTitle(task.title);
-    setEditDescription(task.description || '');
-    setEditPriority(task.priority || 'media');
-    setEditDueDate(task.dueDate || new Date().toISOString().split('T')[0]);
-    setEditAssignedArea(task.assignedArea || 'desarrollo');
-  };
-
   // Guardar cambios de una tarea editada
-  const handleUpdateTask = async (taskId: string) => {
+  const handleUpdateTask = async (taskId: string, updatedFields: Partial<Task>) => {
     setError(null);
-
-    if (!editTitle.trim()) {
-      setError('El título de la tarea es requerido.');
-      return;
-    }
 
     setEditingTaskId(null);
 
     try {
-      await updateTask(taskId, {
-        title: editTitle.trim(),
-        description: editDescription.trim(),
-        priority: editPriority,
-        dueDate: editDueDate,
-        assignedArea: editAssignedArea
-      });
+      await updateTask(taskId, updatedFields);
       setToast({ message: 'Tarea actualizada correctamente', type: 'success' });
-      setEditTitle('');
-      setEditDescription('');
-      setEditPriority('media');
-      setEditDueDate('');
-      setEditAssignedArea('desarrollo');
     } catch (err: unknown) {
       console.error('Error al actualizar la tarea:', err);
       setError('No se pudo actualizar la tarea. Intente de nuevo.');
@@ -323,97 +277,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Formulario de creación de tareas */}
-        <form onSubmit={handleCreateTask} className="task-form">
-          {error && <div className="error-message" style={{ marginBottom: '12px' }}>{error}</div>}
-          
-          {/* Fila 1: Título y Descripción */}
-          <div className="task-form-row">
-            <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-              <input
-                type="text"
-                className="form-input"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Título de la tarea"
-                required
-              />
-            </div>
-            <div className="form-group" style={{ flex: 2, marginBottom: 0 }}>
-              <input
-                type="text"
-                className="form-input"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Descripción (opcional)"
-              />
-            </div>
-          </div>
-
-          {/* Fila 2: Propiedades (Prioridad, Fecha, Área) y Botón */}
-          <div className="task-form-row form-meta-row" style={{ marginTop: '12px' }}>
-            <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-              <label className="form-label-inline" htmlFor="priority">Prioridad:</label>
-              <select
-                id="priority"
-                className="form-input form-select"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as 'alta' | 'media' | 'baja')}
-              >
-                <option value="baja">Baja</option>
-                <option value="media">Media</option>
-                <option value="alta">Alta</option>
-              </select>
-            </div>
-
-            <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-              <label className="form-label-inline" htmlFor="dueDate">Vencimiento:</label>
-              <div style={{ position: 'relative', width: '100%' }}>
-                <input
-                  id="dueDate"
-                  type="date"
-                  className="form-input"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  style={{ paddingRight: '36px' }}
-                  required
-                />
-                <span 
-                  style={{ 
-                    position: 'absolute', 
-                    right: '12px', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)', 
-                    pointerEvents: 'none',
-                    fontSize: '16px' 
-                  }}
-                >
-                  📅
-                </span>
-              </div>
-            </div>
-
-            <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-              <label className="form-label-inline" htmlFor="assignedArea">Área:</label>
-              <select
-                id="assignedArea"
-                className="form-input form-select"
-                value={assignedArea}
-                onChange={(e) => setAssignedArea(e.target.value as 'desarrollo' | 'diseño' | 'marketing' | 'soporte')}
-              >
-                <option value="desarrollo">Desarrollo</option>
-                <option value="diseño">Diseño</option>
-                <option value="marketing">Marketing</option>
-                <option value="soporte">Soporte</option>
-              </select>
-            </div>
-
-            <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end', marginBottom: 0 }}>
-              <button type="submit" className="auth-button" style={{ marginTop: 0, width: '100%', paddingInline: '24px', height: '45px' }}>
-                Agregar
-              </button>
-            </div>
-          </div>
-        </form>
+        <TaskForm onCreateTask={handleCreateTask} error={error} />
 
         {/* Listado de tareas */}
         {loadingTasks ? (
@@ -459,162 +323,18 @@ export const Dashboard = () => {
               </div>
             ) : (
               <div className="task-list">
-                {filteredTasks.map((task) => {
-                  const isEditing = task.id === editingTaskId;
-                  const isHighPriority = task.priority === 'alta';
-                  const cardClass = `task-card ${isEditing ? 'task-card-edit-mode' : ''} ${isHighPriority && !task.completed ? 'priority-alta' : ''}`;
-
-                  return (
-                    <div key={task.id} className={cardClass}>
-                      {isEditing ? (
-                        <div className="task-edit-container" style={{ width: '100%' }}>
-                          <div className="task-edit-inputs" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>Título</label>
-                              <input
-                                type="text"
-                                className="form-input"
-                                value={editTitle}
-                                onChange={(e) => setEditTitle(e.target.value)}
-                                placeholder="Título de la tarea"
-                                required
-                              />
-                            </div>
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>Descripción</label>
-                              <input
-                                type="text"
-                                className="form-input"
-                                value={editDescription}
-                                onChange={(e) => setEditDescription(e.target.value)}
-                                placeholder="Descripción (opcional)"
-                              />
-                            </div>
-                            
-                            <div className="task-form-row form-meta-row" style={{ display: 'flex', gap: '12px' }}>
-                              <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                                <label className="form-label" style={{ fontSize: '12px' }}>Prioridad</label>
-                                <select
-                                  className="form-input form-select"
-                                  value={editPriority}
-                                  onChange={(e) => setEditPriority(e.target.value as 'alta' | 'media' | 'baja')}
-                                >
-                                  <option value="baja">Baja</option>
-                                  <option value="media">Media</option>
-                                  <option value="alta">Alta</option>
-                                </select>
-                              </div>
-                              <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                                <label className="form-label" style={{ fontSize: '12px' }}>Vencimiento</label>
-                                <div style={{ position: 'relative', width: '100%' }}>
-                                  <input
-                                    type="date"
-                                    className="form-input"
-                                    value={editDueDate}
-                                    onChange={(e) => setEditDueDate(e.target.value)}
-                                    style={{ paddingRight: '36px' }}
-                                    required
-                                  />
-                                  <span 
-                                    style={{ 
-                                      position: 'absolute', 
-                                      right: '12px', 
-                                      top: '50%', 
-                                      transform: 'translateY(-50%)', 
-                                      pointerEvents: 'none',
-                                      fontSize: '14px' 
-                                    }}
-                                  >
-                                    📅
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                                <label className="form-label" style={{ fontSize: '12px' }}>Área</label>
-                                <select
-                                  className="form-input form-select"
-                                  value={editAssignedArea}
-                                  onChange={(e) => setEditAssignedArea(e.target.value as 'desarrollo' | 'diseño' | 'marketing' | 'soporte')}
-                                >
-                                  <option value="desarrollo">Desarrollo</option>
-                                  <option value="diseño">Diseño</option>
-                                  <option value="marketing">Marketing</option>
-                                  <option value="soporte">Soporte</option>
-                                </select>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="task-actions edit-mode-actions" style={{ display: 'flex', gap: '8px' }}>
-                            <button 
-                              onClick={() => handleUpdateTask(task.id)} 
-                              className="auth-button" 
-                              style={{ marginTop: 0, width: 'auto', paddingInline: '16px', fontSize: '13px' }}
-                            >
-                              Guardar
-                            </button>
-                            <button 
-                              onClick={() => setEditingTaskId(null)} 
-                              className="auth-button-secondary" 
-                              style={{ marginTop: 0, width: 'auto', paddingInline: '16px', fontSize: '13px' }}
-                            >
-                              Cancelar
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="task-details">
-                            <div className="task-checkbox-container">
-                              <input
-                                type="checkbox"
-                                className="task-checkbox"
-                                checked={task.completed}
-                                onChange={() => handleToggleStatus(task.id, task.completed)}
-                              />
-                            </div>
-                            <div className="task-text">
-                              <h3 className={`task-title ${task.completed ? 'completed' : ''}`}>
-                                {task.title}
-                              </h3>
-                              {task.description && (
-                                <p className={`task-desc ${task.completed ? 'completed' : ''}`}>
-                                  {task.description}
-                                </p>
-                              )}
-
-                              {/* Badges de metadatos avanzadas */}
-                              <div className="task-badges">
-                                <span className={`badge badge-priority-${task.priority || 'media'}`}>
-                                  ⚡ {task.priority ? task.priority.toUpperCase() : 'MEDIA'}
-                                </span>
-                                <span className="badge badge-area">
-                                  📂 {task.assignedArea ? task.assignedArea.toUpperCase() : 'DESARROLLO'}
-                                </span>
-                                {task.dueDate && (
-                                  <span className="badge badge-date">
-                                    📅 {task.dueDate}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="task-actions">
-                            <button 
-                              onClick={() => handleEditClick(task)} 
-                              className="edit-task-button"
-                              style={{ marginRight: '8px' }}
-                            >
-                              Editar
-                            </button>
-                            <button onClick={() => handleDeleteTask(task.id)} className="delete-task-button">
-                              Eliminar
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
+                {filteredTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    isEditing={task.id === editingTaskId}
+                    onEditClick={() => setEditingTaskId(task.id)}
+                    onCancelClick={() => setEditingTaskId(null)}
+                    onUpdateTask={handleUpdateTask}
+                    onToggleStatus={() => handleToggleStatus(task.id, task.completed)}
+                    onDeleteClick={() => handleDeleteTask(task.id)}
+                  />
+                ))}
               </div>
             )}
           </>
@@ -622,14 +342,7 @@ export const Dashboard = () => {
       </main>
 
       {/* Notificación Toast flotante */}
-      {toast && (
-        <div className="toast-container">
-          <div className={`toast ${toast.type}`}>
-            <span>{toast.type === 'success' ? '✅' : '❌'}</span>
-            <span>{toast.message}</span>
-          </div>
-        </div>
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   );
 };

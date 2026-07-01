@@ -354,33 +354,51 @@
   align-items: center;
 }
 
+.edit-task-button,
 .delete-task-button {
   padding: 8px 12px;
   font-size: 13px;
   font-weight: 600;
-  color: #a78278;
-  background: transparent;
-  border: 1px solid var(--border);
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--text-h);
+}
+
+.edit-task-button:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: var(--accent-border);
 }
 
 .delete-task-button:hover {
   background: rgba(239, 68, 68, 0.05);
   color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.25);
 }
 
+.dark-theme .edit-task-button,
 .dark-theme .delete-task-button {
-  color: #c5a095;
+  background: rgba(255, 255, 255, 0.02);
   border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.dark-theme .edit-task-button:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: var(--accent-border);
 }
 
 .dark-theme .delete-task-button:hover {
-  background: rgba(248, 113, 113, 0.1);
-  color: #f87171;
-  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.08);
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.2);
 }
 
 /* Email Report Status Feedbacks */
@@ -453,22 +471,7 @@
 }
 
 /* Edit Task UI Classes */
-.edit-task-button {
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 1px solid var(--accent-border);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.edit-task-button:hover {
-  background: var(--accent);
-  color: #fff;
-}
+/* Estilos de botones heredados del bloque unificado superior */
 
 .task-card-edit-mode {
   border: 1px solid var(--accent) !important;
@@ -1055,14 +1058,14 @@
 
 /* Due Date Badges */
 .badge-date {
-  background: rgba(110, 71, 59, 0.06);
+  background: rgba(110, 71, 59, 0.04);
   color: var(--accent);
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--border);
 }
 .dark-theme .badge-date {
-  background: rgba(197, 155, 109, 0.1);
+  background: rgba(197, 155, 109, 0.08);
   color: var(--accent);
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--border);
 }
 
 /* High Priority card highlighting */
@@ -1183,6 +1186,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     text-align: center;
     height: 38px;
     margin-right: 0 !important; /* Overwrite inline margins */
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .task-badges {
+    gap: 6px;
+    margin-top: 8px;
   }
 }
 

@@ -8,4 +8,7 @@ export interface Task {
   completed: boolean;
   userId: string; // ID del usuario propietario de la tarea
   createdAt: string; // Marca de tiempo en formato ISO
+  priority: 'alta' | 'media' | 'baja';
+  dueDate: string; // Fecha de vencimiento (formato YYYY-MM-DD)
+  assignedArea: 'desarrollo' | 'diseño' | 'marketing' | 'soporte';
 }

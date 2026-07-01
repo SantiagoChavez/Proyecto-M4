@@ -1,10 +1,11 @@
-import { useState, type SubmitEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, type SubmitEvent } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getAuthErrorMessage } from '../utils/authErrors';
+import { useTheme } from '../hooks/useTheme';
 
 /**
- * Vista de inicio de sesión de la aplicación.
+ * Vista de inicio de sesión de la aplicación con diseño visual premium.
  */
 export const Login = () => {
   const [email, setEmail] = useState<string>('');
@@ -12,9 +13,48 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  // Limpieza inicial controlada para evadir autollenados del navegador
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setEmail('');
+      setPassword('');
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Limpiar error al desmontar el componente
+  useEffect(() => {
+    return () => setError(null);
+  }, []);
 
   const { loginWithEmail, loginWithGoogle } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Auto-cierre del Toast después de 3 segundos
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  // Capturar mensaje de redirección de registro exitoso y mostrarlo como Toast
+  useEffect(() => {
+    if (location.state && typeof location.state === 'object' && 'message' in location.state) {
+      const stateObj = location.state as { message: string };
+      setTimeout(() => {
+        setToast({ message: stateObj.message, type: 'success' });
+      }, 0);
+      // Limpiar el estado para evitar que aparezca de nuevo al refrescar
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   // Iniciar sesión con email y contraseña
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
@@ -24,7 +64,7 @@ export const Login = () => {
 
     try {
       await loginWithEmail(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'code' in err) {
         setError(getAuthErrorMessage((err as { code: string }).code));
@@ -41,7 +81,7 @@ export const Login = () => {
     setError(null);
     try {
       await loginWithGoogle();
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'code' in err) {
         setError(getAuthErrorMessage((err as { code: string }).code));
@@ -52,7 +92,19 @@ export const Login = () => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-centered-layout">
+      {/* Selector de Tema Ambiental */}
+      <div className="theme-toggle-container">
+        <button
+          type="button"
+          className="theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+        >
+          {theme === 'light' ? '🌙 Modo Oscuro' : '☀️ Modo Claro'}
+        </button>
+      </div>
+
       <div className="auth-card">
         <h2 className="auth-title">Iniciar Sesión</h2>
         <p className="auth-subtitle">Ingresa tus credenciales para acceder al gestor de tareas.</p>
@@ -60,6 +112,10 @@ export const Login = () => {
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
+          {/* Inputs de despiste invisibles para capturar el Autofill del navegador */}
+          <input type="text" name="fake-email" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+          <input type="password" name="fake-password" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+
           <div className="form-group">
             <label className="form-label" htmlFor="email">Correo Electrónico</label>
             <input
@@ -67,8 +123,12 @@ export const Login = () => {
               type="email"
               className="form-input"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError(null);
+              }}
               placeholder="ejemplo@correo.com"
+              autoComplete="dont-autofill"
               required
             />
           </div>
@@ -81,8 +141,12 @@ export const Login = () => {
                 type={showPassword ? 'text' : 'password'}
                 className="form-input password-field"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(null);
+                }}
                 placeholder="******"
+                autoComplete="new-password"
                 required
               />
               <button
@@ -114,12 +178,26 @@ export const Login = () => {
         </button>
 
         <div className="auth-footer">
-          ¿No tienes una cuenta?{' '}
-          <Link to="/register" className="auth-link">
-            Regístrate aquí
-          </Link>
+          <div>
+            ¿No tienes una cuenta?{' '}
+            <Link to="/register" className="auth-link">
+              Regístrate aquí
+            </Link>
+          </div>
+          <button onClick={() => navigate('/')} className="auth-back-btn">
+            ← Volver al Inicio
+          </button>
         </div>
       </div>
+      {/* Notificación Toast flotante */}
+      {toast && (
+        <div className="toast-container">
+          <div className={`toast ${toast.type}`}>
+            <span>{toast.type === 'success' ? '✅' : '❌'}</span>
+            <span>{toast.message}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

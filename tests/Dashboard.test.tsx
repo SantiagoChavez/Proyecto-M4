@@ -192,9 +192,9 @@ describe('Dashboard Component - Hito 8 Testing', () => {
     await userEvent.click(saveButton);
 
     // Verificar que se haya llamado al servicio updateTask con los datos editados
-    expect(updateTask).toHaveBeenCalledWith('task-to-edit', {
+    expect(updateTask).toHaveBeenCalledWith('task-to-edit', expect.objectContaining({
       title: 'Título Modificado',
       description: 'Descripción Modificada',
-    });
+    }));
   });
 });

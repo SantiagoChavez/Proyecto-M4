@@ -5,6 +5,21 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/)
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-07-01
+
+### Añadido
+- Ordenamiento en memoria de la lista de tareas en las pestañas "Todas" y "Pendientes" para mostrar primero las tareas con mayor prioridad (`alta` > `media` > `baja`) y, en caso de empate, colocar primero las más antiguas por fecha de creación (`createdAt` ascendente).
+- Icono de calendario visual `📅` superpuesto en los inputs de tipo date de los formularios de creación y edición, estandarizando su visibilidad multiplataforma.
+
+### Modificado
+- Flujo de registro en `Register.tsx` modificado para ejecutar `signOut(auth)` explícito inmediatamente después de la creación de la cuenta, previniendo el inicio de sesión automático y redirigiendo al usuario a la vista `/login` con un mensaje de toast en el estado de la ruta.
+- Vista de login en `Login.tsx` actualizada para capturar y mostrar toasts de redirección del flujo de registro con reseteo asíncrono preventivo.
+- Reseteo del estado de error de autenticación en las vistas `Login.tsx` y `Register.tsx` al desmontar el componente (cleanup) y al interactuar con los inputs de credenciales (`onChange`).
+- Método `handleUpdateTask` en `Dashboard.tsx` optimizado para llamar a `setEditingTaskId(null)` de manera prioritaria al iniciar la operación de guardado, acelerando el cierre del formulario y previniendo bloqueos visuales en la interfaz.
+- Sincronización del useEffect de escucha en tiempo real de Firestore en `Dashboard.tsx` actualizado para depender de `user?.uid`, limpiando el estado de las tareas localmente si no existe sesión para evitar la mezcla de datos entre usuarios.
+- Estandarización del selector de fecha en `App.css` ocultando el indicador nativo de WebKit de forma invisible mediante posicionamiento absoluto sobrepuesto transparente, permitiendo que clicks en todo el input abran el selector nativo en todos los navegadores.
+- Ajustada la expectativa del test de actualización CRUD en `tests/Dashboard.test.tsx` mediante `expect.objectContaining` para admitir el paso de valores por defecto del formulario de edición.
+
 ## [0.8.0] - 2026-06-28
 
 ### Añadido
